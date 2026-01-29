@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>指数估值分析</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            📊 指数市盈率估值分析
+            <button class="share-calc-toggle-btn" title="股份计算器">🧮</button>
+        </h1>
+        
+        <div class="main-layout">
+            <div class="left-panel">
+                <div class="calculator-card">
+                    <h3>💰 股票计算器</h3>
+                    <div class="calc-input-group">
+                        <label>当前股价</label>
+                        <div class="price-input-row">
+                            <input type="number" step="0.01" value="10.00" class="stock-price-input" placeholder="输入股价">
+                            <div class="price-change-group">
+                                <div class="price-change-wrapper">
+                                    <input type="number" step="0.1" value="0" class="price-change-input" placeholder="±%">
+                                    <span class="input-unit">%</span>
+                                </div>
+                                <span class="price-change-result">¥10.000</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="calc-section">
+                        <h4>根据股数计算金额</h4>
+                        <div class="calc-row">
+                            <label>股数（手）</label>
+                            <div class="input-with-unit">
+                                <input type="number" step="1" value="1" class="shares-input" placeholder="输入手数">
+                                <span class="input-unit">手</span>
+                            </div>
+                        </div>
+                        <div class="calc-result">
+                            <span class="result-label">实际股数：</span>
+                            <span class="actual-shares">100</span>
+                        </div>
+                        <div class="calc-result">
+                            <span class="result-label">所需金额：</span>
+                            <span class="amount-result">¥1,000.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="calc-section">
+                        <h4>根据金额计算股数</h4>
+                        <div class="calc-row">
+                            <label>投入金额（元）</label>
+                            <div class="input-with-unit">
+                                <input type="number" step="0.01" value="1000" class="amount-input" placeholder="输入金额">
+                                <span class="input-unit">元</span>
+                            </div>
+                        </div>
+                        <div class="calc-result">
+                            <span class="result-label">可买股数：</span>
+                            <span class="buyable-shares">100</span>
+                        </div>
+                        <div class="calc-result">
+                            <span class="result-label">调整后金额：</span>
+                            <span class="adjusted-amount">¥1,000.00</span>
+                        </div>
+                        <div class="calc-result">
+                            <span class="result-label">剩余金额：</span>
+                            <span class="remaining-amount">¥0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="guide-section">
+                    <div class="guide-header">
+                        <button class="guide-toggle">💡 估值区间说明</button>
+                        <button class="guide-edit-btn" title="编辑说明">🔧</button>
+                    </div>
+                    <div class="guide-content">
+                        <div class="guide-intro">
+                            <p><strong>核心逻辑：低买、持股、高卖</strong></p>
+                            <p>通常将历史PE百分位作为参考：0-30%为低估，30-70%为合理，70-100%为高估。</p>
+                        </div>
+                        
+                        <div class="guide-zone">
+                            <h4 class="zone-title low-zone collapsed" onclick="toggleZone(this)">
+                                📈 低估区（PE < 30% 分位）：播种与积累
+                                <span class="zone-toggle">▼</span>
+                            </h4>
+                            <div class="zone-content collapsed editable-cell" data-key="low_zone">
+                                <p><strong>核心心态：</strong>贪婪、耐心、逆向思维</p>
+                                <p><strong>操作策略：</strong></p>
+                                <ul>
+                                    <li><strong>加大定投/分批买入：</strong>启用"倍投法"，每下跌一定幅度（如5%），买入金额增加20%</li>
+                                    <li><strong>只买不卖：</strong>除非基本面发生永久性恶化，否则忽略短期账面亏损，专注于拉低持仓成本</li>
+                                </ul>
+                                <p><strong>🔲 网格策略：吸筹型网格（多头网格）</strong></p>
+                                <ul>
+                                    <li><strong>目标：</strong>利用波动囤积廉价筹码，防止"卖飞"，通过波动降低持仓成本</li>
+                                    <li><strong>网格间距：</strong>宽间距（3%-5%一格）。底部需要拿筹码，不是赚小钱就跑</li>
+                                    <li><strong>单笔买入量：</strong>倍数买入（金字塔式），越跌买越多。第一格买1份，下一格买1.2份或1.5份</li>
+                                    <li><strong>单笔卖出量：</strong>减少卖出或只卖利润，甚至只开启"买入"功能（单向网格）</li>
+                                    <li><strong>止损价：</strong>不设止损（前提是宽基指数或优质ETF），底部波动是暂时的</li>
+                                </ul>
+                                <p><strong>⚠️ 警惕：</strong>最大风险是"倒在黎明前"，需确保资金是长钱，能熬过底部震荡</p>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-zone">
+                            <h4 class="zone-title normal-zone collapsed" onclick="toggleZone(this)">
+                                ⚖️ 合理区（30% ≤ PE ≤ 70% 分位）：持有与等待
+                                <span class="zone-toggle">▼</span>
+                            </h4>
+                            <div class="zone-content collapsed editable-cell" data-key="normal_zone">
+                                <p><strong>核心心态：</strong>平和、坐轿子</p>
+                                <p><strong>操作策略：</strong></p>
+                                <ul>
+                                    <li><strong>持有为主：</strong>让利润奔跑，不要因为涨了一点就急着卖出</li>
+                                    <li><strong>维持标准定投：</strong>恢复到标准金额扣款，不再倍投</li>
+                                    <li><strong>停止大额加仓：</strong>避免抬高整体持仓成本</li>
+                                </ul>
+                                <p><strong>🔲 网格策略：震荡型网格（中性网格）</strong></p>
+                                <ul>
+                                    <li><strong>目标：</strong>在股价没有明确大方向时，利用上下震荡赚取"过路费"差价，提供现金流</li>
+                                    <li><strong>网格间距：</strong>中等间距（1%-2%一格）。波动率正常，太宽难成交，太窄手续费磨损大</li>
+                                    <li><strong>买卖数量：</strong>等额买卖。买入多少股，上涨后就卖出多少股，保持底仓基本不变</li>
+                                    <li><strong>底仓控制：</strong>保持50%左右仓位。进可攻（有筹码享受上涨），退可守（有资金补仓）</li>
+                                    <li><strong>利润处理：</strong>建议利润复投。网格赚到的钱可以直接变成持仓，增加股数</li>
+                                </ul>
+                                <p><strong>⚠️ 警惕：</strong>最容易出现"拿不住"的情况，要忍住频繁操作的手</p>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-zone">
+                            <h4 class="zone-title high-zone collapsed" onclick="toggleZone(this)">
+                                📉 高估区（PE > 70% 分位）：收割与防御
+                                <span class="zone-toggle">▼</span>
+                            </h4>
+                            <div class="zone-content collapsed editable-cell" data-key="high_zone">
+                                <p><strong>核心心态：</strong>恐惧、落袋为安</p>
+                                <p><strong>操作策略：</strong></p>
+                                <ul>
+                                    <li><strong>分批止盈：</strong>设定阶梯止盈，PE进入80%分位卖出20%，进入90%分位再卖出30%</li>
+                                    <li><strong>停止买入：</strong>坚决停止定投和任何买入操作</li>
+                                    <li><strong>资产轮动：</strong>将卖出资金转移到低估区资产或债基/理财产品</li>
+                                </ul>
+                                <p><strong>🔲 网格策略：减仓型网格（空头网格）</strong></p>
+                                <ul>
+                                    <li><strong>目标：</strong>在泡沫形成过程中分批撤退，防止"坐过山车"，即使卖飞也不后悔</li>
+                                    <li><strong>价格区间：</strong>上限设得很高（甚至不设），但下限要跟随价格上移（移动止盈）</li>
+                                    <li><strong>买入限制：</strong>大幅减少接回或停止接回。卖出后回调触发买入时，只买回1/3或不买</li>
+                                    <li><strong>网格间距：</strong>由密变宽。刚进入高估区可以密一点，随着估值极端高估（90%分位），拉大间距</li>
+                                    <li><strong>最终止盈：</strong>必须设置网格停止价。一旦趋势彻底反转，网格停止运行，全部清仓离场</li>
+                                </ul>
+                                <p><strong>⚠️ 警惕：</strong>市场在高估区可能疯狂很久，"分批"卖出比"一次性"清仓更稳妥。任何回调都可能是崩盘开始，不要为赚差价而重新被套山顶</p>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-warning">
+                            <h4>⚠️ 重要补充：不同行业的PE陷阱</h4>
+                            <div class="warning-content editable-cell" data-key="warning">
+                                <p><strong>强周期行业（如航运、有色）：</strong>往往是"高PE买入，低PE卖出"。业绩爆发时PE极低，但这往往是周期见顶的标志</p>
+                                <p><strong>成长型行业（如科技）：</strong>市场给予高溢价，难以等到极低PE。需结合PEG来看，或参考该指数自身的历史百分位</p>
+                                <p><strong>宽基指数（如沪深300）：</strong>最适合上述标准的PE区间操作法</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="index-list">
+            <div class="index-card" data-index="0">
+                <div class="index-header">
+                    <h2>动漫游戏 (930901)</h2>
+                    <div class="pe-input-group">
+                        <label>当前PE：</label>
+                        <input type="number" step="0.01" value="41.61" class="pe-input">
+                    </div>
+                </div>
+                <div class="percentile-info">
+                    <label>当前分位：</label>
+                    <input type="number" step="0.01" value="31.12" class="percentile-display" min="0" max="100">
+                    <span class="percentile-unit">%</span>
+                    <span class="status-text">低估边缘</span>
+                </div>
+                <div class="visualization">
+                    <div class="pe-bar">
+                        <div class="bar-section low"></div>
+                        <div class="bar-section normal"></div>
+                        <div class="bar-section high"></div>
+                        <div class="current-marker"></div>
+                    </div>
+                    <div class="pe-labels">
+                        <span class="pe-label label-30">
+                            30分位<br>
+                            <input type="number" step="0.01" value="41.41" class="pe30-input">
+                        </span>
+                        <span class="pe-label label-70">
+                            70分位<br>
+                            <input type="number" step="0.01" value="47.69" class="pe70-input">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="index-card" data-index="1">
+                <div class="index-header">
+                    <h2>中证银行 (399986)</h2>
+                    <div class="pe-input-group">
+                        <label>当前PE：</label>
+                        <input type="number" step="0.01" value="6.76" class="pe-input">
+                    </div>
+                </div>
+                <div class="percentile-info">
+                    <label>当前分位：</label>
+                    <input type="number" step="0.01" value="38.17" class="percentile-display" min="0" max="100">
+                    <span class="percentile-unit">%</span>
+                    <span class="status-text">合理偏低</span>
+                </div>
+                <div class="visualization">
+                    <div class="pe-bar">
+                        <div class="bar-section low"></div>
+                        <div class="bar-section normal"></div>
+                        <div class="bar-section high"></div>
+                        <div class="current-marker"></div>
+                    </div>
+                    <div class="pe-labels">
+                        <span class="pe-label label-30">
+                            30分位<br>
+                            <input type="number" step="0.01" value="6.64" class="pe30-input">
+                        </span>
+                        <span class="pe-label label-70">
+                            70分位<br>
+                            <input type="number" step="0.01" value="7.25" class="pe70-input">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="index-card" data-index="2">
+                <div class="index-header">
+                    <h2>沪深300 (000300)</h2>
+                    <div class="pe-input-group">
+                        <label>当前PE：</label>
+                        <input type="number" step="0.01" value="14.21" class="pe-input">
+                    </div>
+                </div>
+                <div class="percentile-info">
+                    <label>当前分位：</label>
+                    <input type="number" step="0.01" value="87.14" class="percentile-display" min="0" max="100">
+                    <span class="percentile-unit">%</span>
+                    <span class="status-text">严重高估</span>
+                </div>
+                <div class="visualization">
+                    <div class="pe-bar">
+                        <div class="bar-section low"></div>
+                        <div class="bar-section normal"></div>
+                        <div class="bar-section high"></div>
+                        <div class="current-marker"></div>
+                    </div>
+                    <div class="pe-labels">
+                        <span class="pe-label label-30">
+                            30分位<br>
+                            <input type="number" step="0.01" value="12.73" class="pe30-input">
+                        </span>
+                        <span class="pe-label label-70">
+                            70分位<br>
+                            <input type="number" step="0.01" value="14.03" class="pe70-input">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="index-card" data-index="3">
+                <div class="index-header">
+                    <h2>中国互联网50 (H30533)</h2>
+                    <div class="pe-input-group">
+                        <label>当前PE：</label>
+                        <input type="number" step="0.01" value="19.61" class="pe-input">
+                    </div>
+                </div>
+                <div class="percentile-info">
+                    <label>当前分位：</label>
+                    <input type="number" step="0.01" value="61.41" class="percentile-display" min="0" max="100">
+                    <span class="percentile-unit">%</span>
+                    <span class="status-text">合理偏高</span>
+                </div>
+                <div class="visualization">
+                    <div class="pe-bar">
+                        <div class="bar-section low"></div>
+                        <div class="bar-section normal"></div>
+                        <div class="bar-section high"></div>
+                        <div class="current-marker"></div>
+                    </div>
+                    <div class="pe-labels">
+                        <span class="pe-label label-30">
+                            30分位<br>
+                            <input type="number" step="0.01" value="18.30" class="pe30-input">
+                        </span>
+                        <span class="pe-label label-70">
+                            70分位<br>
+                            <input type="number" step="0.01" value="19.84" class="pe70-input">
+                        </span>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 股份计算器模态框 -->
+    <div class="share-calc-modal">
+        <div class="share-calc-modal-content">
+            <div class="share-calc-modal-header">
+                <h3>📊 股份计算器</h3>
+                <button class="share-calc-close-btn">×</button>
+            </div>
+            
+            <div class="share-calculator-card">
+                <div class="share-step">
+                    <h4>第一步：填写投入金额</h4>
+                    <div class="share-input-group">
+                        <label>A 之前投了多少钱？</label>
+                        <div class="share-input-row">
+                            <input type="number" step="0.01" value="9900" class="a-old-input" placeholder="A旧">
+                            <span class="input-unit">元</span>
+                        </div>
+                    </div>
+                    <div class="share-input-group">
+                        <label>B 之前投了多少钱？</label>
+                        <div class="share-input-row">
+                            <input type="number" step="0.01" value="100" class="b-old-input" placeholder="B旧">
+                            <span class="input-unit">元</span>
+                        </div>
+                    </div>
+                    <div class="share-input-group">
+                        <label>当前盈亏（正数为盈利，负数为亏损）</label>
+                        <div class="share-input-row">
+                            <input type="number" step="0.01" value="-70" class="profit-loss-input" placeholder="盈亏">
+                            <span class="input-unit">元</span>
+                        </div>
+                    </div>
+                    <div class="share-input-group">
+                        <label>A 这次新加多少钱？</label>
+                        <div class="share-input-row">
+                            <input type="number" step="0.01" value="1000" class="a-new-input" placeholder="A新">
+                            <span class="input-unit">元</span>
+                        </div>
+                    </div>
+                    <div class="share-input-group">
+                        <label>B 这次新加多少钱？</label>
+                        <div class="share-input-row">
+                            <input type="number" step="0.01" value="0" class="b-new-input" placeholder="B新">
+                            <span class="input-unit">元</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="share-step">
+                    <h4>第二步：计算过程</h4>
+                    <div class="share-result-box">
+                        <div class="share-calc-step">
+                            1. 原投入总额 = <strong class="old-total-result">10,000.00</strong> 元
+                        </div>
+                        <div class="share-calc-step">
+                            2. 当前资产价值 = <strong class="current-value-result">9,930.00</strong> 元
+                        </div>
+                        <div class="share-calc-step">
+                            3. A新 + B新 = <strong class="new-total-result">1,000.00</strong> 元
+                        </div>
+                        <div class="share-calc-step">
+                            4. 最终总资产 = <strong class="final-total-result">10,930.00</strong> 元
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="share-step">
+                    <h4>第三步：持股比例</h4>
+                    <div class="share-result-box" style="margin-bottom: 10px;">
+                        <div class="share-calc-step">
+                            A的权益 = (9930 × 9900/10000) + 1000 = <strong class="a-equity-result">10,830.70</strong> 元
+                        </div>
+                        <div class="share-calc-step">
+                            B的权益 = (9930 × 100/10000) + 0 = <strong class="b-equity-result">99.30</strong> 元
+                        </div>
+                    </div>
+                    <div class="share-final-result">
+                        <h5>📈 最终结果</h5>
+                        <div class="share-percentage">
+                            <span>A 的股份：</span>
+                            <div class="share-percentage-value">
+                                <span class="percentage a-percentage-result">99.0909091%</span>
+                                <span class="money a-money-result">¥10,830.70</span>
+                                <span class="profit-percent a-profit-percent positive">+0.28%</span>
+                            </div>
+                        </div>
+                        <div class="share-percentage">
+                            <span>B 的股份：</span>
+                            <div class="share-percentage-value">
+                                <span class="percentage b-percentage-result">0.9090909%</span>
+                                <span class="money b-money-result">¥99.30</span>
+                                <span class="profit-percent b-profit-percent negative">-0.70%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="share-example">
+                    <h5>💡 说明</h5>
+                    <p>考虑盈亏后的股份计算：原投入产生的盈亏按原投入比例分配，新增投入按实际金额计入各自权益。</p>
+                    <p>例：A原投9900，B原投100，亏70元后，A承担69.3元亏损，B承担0.7元亏损。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
