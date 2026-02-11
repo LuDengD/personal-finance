@@ -219,6 +219,13 @@ function toggleZone(titleElement) {
     titleElement.classList.toggle('collapsed');
 }
 
+// 切换子区域折叠
+function toggleSubZone(titleElement) {
+    const content = titleElement.nextElementSibling;
+    content.classList.toggle('collapsed');
+    titleElement.classList.toggle('collapsed');
+}
+
 // 切换股份计算器模态框
 function toggleShareCalcModal() {
     const modal = document.querySelector('.share-calc-modal');
